@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
 import pandas as pd
- 
+
 budget = pd.read_csv("mn-budget-detail-2014.csv")
 budget = budget.sort_values('amount',ascending=False)[:10]
 pd.options.display.mpl_style = 'default'  
