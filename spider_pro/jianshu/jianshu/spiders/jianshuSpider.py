@@ -25,15 +25,26 @@ class Jianshu(scrapy.Spider):
     	item = JianshuItem()
     	# print 'responseInfo:'+response.body
         selector = scrapy.Selector(response)
-        articles = selector.xpath('//ul[@class="note-list"]/li')
-        print 'selector:'+str(selector)
-        print 'articles.count'+str(len(articles))
+        articles = selector.xpath('//ul[@class="note-list"]')
+        # print 'selector:'+str(selector)
+        print 'articles.count:'+str(len(articles))
         for article in articles:
         	# print 'article:'+str(article)
         	titles = article.xpath('//a[@class="title"]/text()').extract()
+        	print 'titles.count:'+str(len(titles))
         	for  title in titles:
         		# title = title.xpath('///div/a/text()').extract()	
 	       		print 'title:'+title
 	       		item['title'] = title
         		yield item
+		next_link = selector.xpath('//*[@id="list-container"]/div/button/@data-page').extract()
+
+
+
+        if len(next_link)==1 :
+
+            next_link = self.url+ str(next_link[0])
+            print "----"+next_link
+            yield Request(next_link,headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'},callback=self.parse)
+
 		
