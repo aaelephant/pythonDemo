@@ -37,8 +37,8 @@ class Jianshu(scrapy.Spider):
 	       		print 'title:'+title
 	       		item['title'] = title
         		yield item
-		next_link = selector.xpath('//*[@id="list-container"]/div/button/@data-page').extract()
-
+		next_link = selector.xpath('//a[@class="load-more"]').extract()
+	print 'next_link:'+str(len(next_link))
 
 
         if len(next_link)==1 :
