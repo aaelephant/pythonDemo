@@ -37,14 +37,14 @@ class Jianshu(scrapy.Spider):
 	       		print 'title:'+title
 	       		item['title'] = title
         		yield item
-		next_link = selector.xpath('//a[@class="load-more"]').extract()
-	print 'next_link:'+str(len(next_link))
+		# next_link = selector.xpath('//a[@class="load-more"]').extract()
+	# print 'next_link:'+str(len(next_link))
 
 
-        if len(next_link)==1 :
+        # if len(next_link)==1 :
 
-            next_link = self.url+ str(next_link[0])
-            print "----"+next_link
-            yield Request(next_link,headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'},callback=self.parse)
+        # next_link = self.url+ '/3'
+        # print "----"+next_link
+        # yield Request(next_link,headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'},callback=self.parse)
 
 		

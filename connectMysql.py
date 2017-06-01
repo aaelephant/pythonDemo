@@ -11,10 +11,18 @@ class ConnectMysql(object):
 		super(ConnectMysql, self).__init__()
 		return
 	def configMdb(self):
-		conn = MySQLdb.connect(host='localhost', user='root', passwd='', db='vr_bi_table_video_play_statistics')
+		conn = MySQLdb.connect(host='localhost', user='root', passwd='123456abc', db='vr_bi_table_video_play_statistics')
 		self.cursor = conn.cursor()	
 		return
-
+	def getColumns(self):
+		sql = 'SELECT column_name, column_type FROM information_schema.columns WHERE table_schema=\'vr_bi_table_video_play_statistics\' AND table_name=\'video_play_statistics\''
+		self.cursor.execute(sql)
+		columns = self.cursor.fetchall()
+		for column in columns:
+			if column[1] == 'varchar(50)':
+				print 'is varchar(50)\n'
+			print 'column_name:'+column[0]+'\ncolumn_type:'+column[1];
+		return
 	def searchFromMdb(self,line):
 		print '搜索...'
 		params = line.split(' ')
@@ -48,10 +56,13 @@ class ConnectMysql(object):
 		return
 	def main(self):
 		self.configMdb()
+		self.getColumns()
 		self.waitingInput()
 		return
 
 def test():
 	connectMysql = ConnectMysql()
 	connectMysql.main()
-
+	
+	
+test()
