@@ -1,4 +1,5 @@
 #!/usr/local/bin/python
+#-*- coding:utf-8 -*-
 
 import io
 import pandas as pd
@@ -74,18 +75,43 @@ def collectionFiles():
 	for dirName in dirNames:
 		collectionFile(dirName)
 	
+def un_tar(file_name):  
+	namesSplits = file_name.split('.')
+	# dirName = namesSplits[0]
+	tar = tarfile.open(file_name)  
+	names = tar.getnames()  
+	# if os.path.isdir(dirName):  
+		# pass  
+	# else:  
+		# os.mkdir(dirName)  
+#由于解压后是许多文件，预先建立同名文件夹  
+	for name in names:  
+		tar.extract(name, '/Users/qbshen/Work/python/Demand/json_logs/')  
+	tar.close() 
 
 if __name__ == '__main__':
-
-	collectionFiles()
+	import tarfile
+	inputPath = '/Users/qbshen/Work/python/Demand/json_logs/'
+	fileNames = getAllFiles(inputPath)
+	print fileNames
+	finalNames = []
+	for fileName in fileNames:
+		r = fileName.find('.tar.gz')
+		print r
+		if r>=0:
+			finalNames.append(fileName)
+	print finalNames
+	for finalName in finalNames:
+		un_tar(os.path.join(inputPath, finalName))
+	# collectionFiles()
 	# with open(path, 'r') as f:
 	#     objects = ijson.items(f, 'item')
 	#     columns = list(objects)
 	#     jsonStr = json.dumps(columns)
-	df = pd.read_json(path)
-	groupbyuserId = df.groupby([const.COLUMN_VIDEOSID,const.COLUMN_USERID])
-	gr = groupbyuserId.size().to_frame()
-	print gr
+	# df = pd.read_json(path)
+	# groupbyuserId = df.groupby([const.COLUMN_VIDEOSID,const.COLUMN_USERID])
+	# gr = groupbyuserId.size().to_frame()
+	# print gr
     # objects = ijson.parse(columns[0])
     # objects = ijson.items(columns, 'logs')
     # columns = list(objects)

@@ -1,4 +1,5 @@
 #!/usr/local/bin/python
+#-*- coding:utf-8 -*-
 
 import io
 import pandas as pd
@@ -82,12 +83,16 @@ class CollectionFile(object):
 		dirNames = self.getAllDirs(inputPath)
 		for dirName in dirNames:
 			self.collectionFiles(os.path.join(inputPath,dirName), dirName)
-
+	
 	def start(self):
+
 		self.searchDirs(self.inputPath)
+
 if __name__ == '__main__':
+
+	# un_tars(inputPath)
 	inputPath = '/Users/qbshen/Work/python/Demand/json_logs/output/datas/'
-	path = os.path.join(inputPath,'play','20170614/log.vr.play.log')
+	# path = os.path.join(inputPath,'play','20170614/log.vr.play.log')
 	collectionFile = CollectionFile(inputPath)
 	collectionFile.start()
 	# with open(path, 'r') as f:

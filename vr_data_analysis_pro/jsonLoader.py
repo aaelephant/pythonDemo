@@ -7,6 +7,7 @@ from collections import OrderedDict
 import os
 from pprint import pprint
 import pandas as pd
+import tarfile
 # file = io.open('hello.py', 'r')
 # result = file.readall()
 
@@ -312,7 +313,33 @@ class OutLogsData(object):
 				outFileName = os.path.splitext(fileName)[0]+'_'+pageId+'.log'
 				logs = self.loadLogsData(filePath, pageId)
 				self.save(pageId,subDirName,outFileName,logs)
+	def un_tar(self, file_name, outPutPath):  
+		namesSplits = file_name.split('.')
+		# dirName = namesSplits[0]
+		tar = tarfile.open(file_name)  
+		names = tar.getnames()  
+		# if os.path.isdir(dirName):  
+			# pass  
+		# else:  
+			# os.mkdir(dirName)  
+	#由于解压后是许多文件，预先建立同名文件夹  
+		for name in names:  
+			tar.extract(name, outPutPath)  
+		tar.close() 
+	def un_tars(self, inputPath):
+		fileNames = self.getAllFiles(inputPath)
+		print fileNames
+		finalNames = []
+		for fileName in fileNames:
+			r = fileName.find('.tar.gz')
+			print r
+			if r>=0:
+				finalNames.append(fileName)
+		print finalNames
+		for finalName in finalNames:
+			self.un_tar(os.path.join(inputPath, finalName), inputPath)
 	def start(self):
+		self.un_tars(self.inputPath)
 		dirNames = self.getAllDirs(self.inputPath)
 		
 		for dirName in dirNames:
@@ -321,6 +348,7 @@ class OutLogsData(object):
 			self.readItemDir(fileDir,dirName)
 
 if __name__ == '__main__':
+
 	outLogsData = OutLogsData('/Users/qbshen/Work/python/Demand/json_logs/input','/Users/qbshen/Work/python/Demand/json_logs/output/datas/')
 	outLogsData.start()
 # with open(filePath,'r') as f:
