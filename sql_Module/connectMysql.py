@@ -19,9 +19,12 @@ class ConnectMysql(object):
 		return
 
 	def getColumns(self):
-		sql = "SELECT column_name FROM information_schema.columns WHERE table_schema ='%s' AND table_name='%s'" % (self.schema_name,self.table_name)
+		sql = "SELECT column_name, DATA_TYPE,COLUMN_COMMENT FROM information_schema.columns WHERE table_schema ='%s' AND table_name='%s'" % (self.schema_name,self.table_name)
 		self.cursor.execute(sql)
 		r = self.cursor.fetchall()
+		# print 'Columns:\n'
+		# for cur in r:
+			# print cur[0]+' '+cur[1]+ ' '+ cur[2]
 		return r
 	def installSubSqls(self,params):#key,value list
 		subSqls = []
@@ -48,7 +51,7 @@ class ConnectMysql(object):
 		print '获取到'+str(len(r))+'条纪录'
 		return r
 	def selectWithFactor(self,factor):
-		sql = "select * from video_play_statistics where\
+		sql = "select * from video_play_statistics \
 		%s" %(factor)
 		r = self.select(sql)
 		return 	r
@@ -100,6 +103,8 @@ class ConnectMysql(object):
 			if self.handleInput(line) ==0 :
 				break
 		return
+	def connector(self):
+		return self.conn
 	def close(self):
 		self.conn.close()
 		print 'db close'

@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 
-# import pandas as pd
+import pandas as pd
 from bokeh.charts import Bar , output_file, show
  
 budget = pd.read_csv("mn-budget-detail-2014.csv")

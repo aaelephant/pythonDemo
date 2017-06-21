@@ -5,6 +5,8 @@ import pandas as pd
 
 import sys
 sys.path.append('../../../')
+import sql_Module.connectMysql as conMysql
+
 sys.path.append('../../')
 
 from sql_Module.mysql_const import const
@@ -13,10 +15,19 @@ from live_play_entity import LivePlayEntity
 
 from play_statistics_base import PlayStatisticsBase
 
-class LivePlayStatistics(PlayStatisticsBase):
+
+
+class LivePlayStatistics(object):
 	"""docstring for LivePlayStatistics"""
+	# def __init__(self):
+	# 	super(LivePlayStatistics, self).__init__()
 	def __init__(self):
 		super(LivePlayStatistics, self).__init__()
+		self.conms = conMysql.ConnectMysql()
+		self.conms.configMdb()
+
+		self.loop = True
+		self.chunkSize = 10000
 		
 	def installChunks(self, columns, kwargs):
 		columnStr = ''
@@ -33,7 +44,7 @@ class LivePlayStatistics(PlayStatisticsBase):
 		chunks = pd.read_sql(sql,\
 	 			 con=self.conms.connector(), chunksize=self.chunkSize)
 		return chunks
-	def live_play_totalCount(self, **kwargs):
+	def videoPlayCountDataFrame(self, kwargs):
 		ascending = True
 		if kwargs.has_key('ascending'):
 			ascending = kwargs['ascending']
@@ -43,59 +54,86 @@ class LivePlayStatistics(PlayStatisticsBase):
 		# print type(df)
 		groupbyVideoSid = df.groupby(const.COLUMN_VIDEOSID)
 		print groupbyVideoSid.size()
+		dfVideoSid = groupbyVideoSid.size().sort_values(ascending=False).to_frame()
+		return dfVideoSid
+	def videoPlayUserCountDataFrame(self, kwargs):
+		ascending = True
+		if kwargs.has_key('ascending'):
+			ascending = kwargs['ascending']
+		columns = [const.COLUMN_VIDEOSID,const.COLUMN_USERID]
+		chunks = self.installChunks(columns, kwargs)
+		df = pd.concat(chunks, ignore_index=False)
 		groupbyuserId = df.groupby([const.COLUMN_VIDEOSID,const.COLUMN_USERID])
 		gr = groupbyuserId.size().to_frame()
 		r = gr.groupby(const.COLUMN_VIDEOSID)
-		# print r.size()
-		dfVideoSid = groupbyVideoSid.size().sort_values(ascending=False).to_frame()
 		dfUserId = r.size().to_frame()
-		print dfUserId
 		dfUserId.rename(columns={0: 'userCount'}, inplace=True)
-		dfMerge = pd.merge(dfVideoSid,dfUserId,left_index=True,right_index=True,how='left')
-		print dfMerge
-		
-		# dfMerge.to_excl("video_play_user.")
-		# print len(groupbyVideoSid.size()["62a20fce53c44d6682f959b5df7ae31a"])
-# df = df.groupby(by=['column_A'])['column_B'].sum()
-# 　　生成的数据类型是Series,如果进一步需要将其转换为dataframe,可以调用Series中的to_frame()方法.
-		# groupbyuserId = groupbyVideoSid.apply(const.COLUMN_USERID)
-		# print groupbyuserId.size().index
-		# groupbyVideoSidMergeUserId = pd.merge(groupbyVideoSid,groupbyuserId, key=const.COLUMN_VIDEOSID)
+		print dfUserId
+		return dfUserId
 
-		# print groupbyVideoSidMergeUserId
-		# dfGroupby.rename(columns={0: 'id'}, inplace=True);
-		# print dfGroupby.index.values
-		columns1 = [const.COLUMN_VIDEOSID,const.COLUMN_VIDEONAME]
-		chunksInfo = self.installChunks(columns1,kwargs)
+	def videoInfoDataFrame(self, kwargs):
+		ascending = True
+		if kwargs.has_key('ascending'):
+			ascending = kwargs['ascending']
+		columns = [const.COLUMN_VIDEOSID,const.COLUMN_VIDEONAME]
+		chunksInfo = self.installChunks(columns,kwargs)
 		dfInfo = pd.concat(chunksInfo, ignore_index=False)
 		print dfInfo
-		dfMergeWithInfo = pd.merge(dfMerge,dfInfo,left_index=True,right_on=const.COLUMN_VIDEOSID,how='left').drop_duplicates()
+		return dfInfo
+
+	def mergeVideoPlayCountAndPlayUserCount(self,kwargs):
+		df_videoPlayCount = self.videoPlayCountDataFrame(kwargs)
+		df_videoPlayUserCount = self.videoPlayUserCountDataFrame(kwargs)
+		dfMerge = pd.merge(df_videoPlayCount,df_videoPlayUserCount,left_index=True,right_index=True,how='left')
+		print dfMerge
+		return dfMerge
+
+	def installVideoInfo(self,dfMerge,kwargs):
+		df_videoInfo = self.videoInfoDataFrame(kwargs)
+
+		dfMergeWithInfo = pd.merge(dfMerge,df_videoInfo,left_index=True,right_on=const.COLUMN_VIDEOSID,how='left').drop_duplicates()
 		dfMergeWithInfo.rename(columns={0: 'playCount'}, inplace=True)
 		dfMergeWithInfo = dfMergeWithInfo.reset_index()
-		# del dfMergeWithInfo['index']
 		print dfMergeWithInfo
-		writer = pd.ExcelWriter('output.xlsx')
-		dfMergeWithInfo.to_excel(writer,'Sheet1')
-		# df2.to_excel(writer,'Sheet2')
-		writer.save()
-		# for cur in dfMerge:
-			# print cur
-		return
-		
-		dataList = self.installInfo(r)
-		self.writetoNewExcle(dataList,'live_play_statistics')
-		# for level,subsetDF in r:
-		# 	# print level
-		# 	r2 = subsetDF.groupby(subsetDF[const.COLUMN_VIDEOSID]).size()
-		# 	print r2.iloc[0]
+		return dfMergeWithInfo
 
-			# break
-		# r = r.sort_values(ascending=False)
-		# for videoSid in r.index.values:
+	def to_excel(self,originDataFrame):
+		from datetime import datetime
+		# dt = datetime.now()
+		# 获取日期：
+		# today =datetime.date.today()    #获取今天日期
+		# deltadays =datetime.timedelta(days=1)    #确定日期差额，如前天 days=2
+		# yesterday =today -deltadays    # 获取差额日期，昨天
+		# tomorrow =today +dletadays     # 获取差额日期，明天
+		# # 格式化输出
+		# ISOFORMAT='%Y%m%d%h%s' #设置输出格式
+		# print today.strftime(ISOFORMAT)
+		fileName = 'play_statistics'+'.xlsx'
+		writer = pd.ExcelWriter(fileName)
+		originDataFrame.to_excel(writer,'Sheet1')
+		writer.save()
+		return fileName
+	def paserParams(self,kwargs):
+		if kwargs.has_key(const.COLUMN_SCREENTYPE):
+
+			if kwargs.has_key(const.COLUMN_VIDEOTYPE):
+				videoType = kwargs[const.COLUMN_VIDEOTYPE]
+				if videoType=='live':
+					kwargs[const.COLUMN_SCREENTYPE]='1'
+				
+	def live_play_totalCount(self, **kwargs):
+		self.paserParams(kwargs)
+		df_merge = self.mergeVideoPlayCountAndPlayUserCount(kwargs)
+		df_videoInfo = self.videoInfoDataFrame(kwargs)
+		dfMergeWithInfo = self.installVideoInfo(df_merge,kwargs)
 		
-		# print r
-		return
+		print dfMergeWithInfo
+		fileName = self.to_excel(dfMergeWithInfo)
+		return fileName
 
 if __name__ == '__main__':
 	obj = LivePlayStatistics()
-	obj.live_play_totalCount(startDate='2016-05-01',videoType='live',actionType='startplay',ascending=False)
+	obj.live_play_totalCount(startDate='2016-05-01',endDate='2017-05-03',videoType='VR',actionType='startplay',screenType='2',ascending=False)
+
+
+

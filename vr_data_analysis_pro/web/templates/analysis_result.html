@@ -1,0 +1,14 @@
+$def with (start_date,end_date,file_name,videoType)
+
+<ul>
+    <li>开始时间：$start_date</li>
+
+    <li>截止时间：$end_date</li>
+</ul>
+
+<form method="POST" action="download">
+  <!-- <input type="" name="file_name" value=$file_name> -->
+  <p>
+    <button  type="submit" name="file_name" value=$file_name>下载$file_name</button>
+  </p>
+</form>

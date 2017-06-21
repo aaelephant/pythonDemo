@@ -1,0 +1,38 @@
+$def with ()
+
+
+<form method="post" action="startAnalysis">
+<select id = "videoTypeId" name="videoType">  
+<option value = "">---选择要统计的视频类型---</option>  
+<option value = "VR">全景VR</option>  
+<option value = "3D">3D</option>  
+<option value = "live">直播</option>  
+
+</select> 
+  <p>
+    <label>开始时间</label> <input type="date"  name="start_date" oninput=""/>    
+  </p>
+  <p>
+    <label>截止时间</label> <input type="date" name="end_date" oninput=""/>  
+  </p>
+  
+  <p>
+    <button>开始统计</button>
+  </p>
+
+</form>
+ 
+ <!--  <head>
+      <title> A demo</title>
+      <link rel="stylesheet" type="text/css" href="web/static/css/style.css">
+
+  </head>
+  <body>
+   <header>
+     <h1>Title</h1>
+   </header>
+   <main>
+     <p class="hello">Hello World pip!</p>
+   </main>
+   <script type="text/javascript" src="web/static/js/app/analysis.js"></script>
+  </body> -->
