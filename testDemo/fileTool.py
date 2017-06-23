@@ -43,7 +43,7 @@ def reWrite(filePath, isLast, fo):
 	    utf8str = s.encode("UTF-8")
 	    utf8str = utf8str.replace('[','')
 	    utf8str = utf8str.replace(']','')
-	    utf8str = utf8str.replace('\n',replaceStr)
+	    utf8str = utf8str.replace('n',replaceStr)
 	    if not s:
 	    	break
 	    fo.write(unicode(utf8str,'utf-8'))
@@ -119,9 +119,9 @@ if __name__ == '__main__':
 
 # import json
 
-# json_data = [{'name':'Wang','sal':50000,'job':'VP'},\
+# json_data = [{'name':'Wang','sal':50000,'job':'VP'},
 
-#  {'name':'Zhang','job':'Manager','report':'VP'},\
+#  {'name':'Zhang','job':'Manager','report':'VP'},
 
 #  {'name':'Li','sal':5000,'report':[{'a':'va'}]}]
 

@@ -62,7 +62,7 @@ class MYFTP:
 		file_handler = open(localfile, 'wb')
 		self.ftp.retrbinary('RETR %s'%(remotefile), file_handler.write)
 		file_handler.close()
-
+	
 	def download_files(self, localdir='./', remotedir='./'):
 		try:
 			self.ftp.cwd(remotedir)
@@ -77,6 +77,7 @@ class MYFTP:
 		remotenames = self.file_list
 		#print(remotenames)
 		#return
+
 		for item in remotenames:
 			filetype = item[0]
 			filename = item[1]
@@ -137,29 +138,12 @@ def deal_error(e):
 	debug_print(logstr)
 	file.write(logstr)
 	sys.exit()
-def datetime_to_timestamp(datetime_obj):
-    """将本地(local) datetime 格式的时间 (含毫秒) 转为毫秒时间戳
-    :param datetime_obj: {datetime}2016-02-25 20:21:04.242000
-    :return: 13 位的毫秒时间戳  1456402864242
-    """
-    local_timestamp = long(time.mktime(datetime_obj.timetuple()) * 1000000.0 + datetime_obj.microsecond)
-    return local_timestamp
+
 if __name__ == '__main__':
 	file = open("log.txt", "a")
-	# timenow  = time.localtime()
-	# print timenow
-	# import datetime
-	# ticks = str(datetime.datetime.now().microsecond)
-	# print ticks
-	# 当前时间：datetime 格式
-	# local_datetime_now = datetime.datetime.now()
-	# 当前时间：字符串格式
-	# local_strtime_now = datetime_to_strtime(local_datetime_now)
-	# 当前时间：时间戳格式 13位整数
-
-	# local_timestamp_now = datetime_to_timestamp(local_datetime_now)
-	# print local_timestamp_now
-	# logstr = datenow
+	timenow  = time.localtime()
+	datenow  = time.strftime('%Y-%m-%d', timenow)
+	logstr = datenow
 	# 配置如下变量
 	hostaddr = '120.132.66.42' # ftp地址
 	username = 'metisftp' # 用户名
@@ -173,10 +157,10 @@ if __name__ == '__main__':
 	f.login()
 	f.download_files(rootdir_local, rootdir_remote)
 	
-	# timenow  = time.localtime()
-	# datenow  = time.strftime('%Y-%m-%d', timenow)
-	# logstr += " - %s 成功执行了备份\n" %datenow
-	# debug_print(logstr)
+	timenow  = time.localtime()
+	datenow  = time.strftime('%Y-%m-%d', timenow)
+	logstr += " - %s 成功执行了备份\n" %datenow
+	debug_print(logstr)
 	
-	# file.write(logstr)
-	# file.close()
+	file.write(logstr)
+	file.close()
